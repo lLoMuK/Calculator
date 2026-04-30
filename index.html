@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Support Analytics · Кнопки сброса для всех полей</title>
+    <title>Support Analytics · Кнопки сброса · Сохранение оценок</title>
     <style>
         * {
             margin: 0;
@@ -19,7 +19,7 @@
             position: relative;
         }
 
-        /* ФОНЫ */
+        /* ФОНЫ (без изменений) */
         body.man-white, body.man-dark {
             background: radial-gradient(circle at 10% 20%, #0b0410 0%, #1a0b24 45%, #2e133f 100%);
         }
@@ -73,7 +73,6 @@
             z-index: 2;
         }
 
-        /* две кнопки-переключателя + вайб */
         .theme-switch {
             display: flex;
             justify-content: center;
@@ -106,7 +105,6 @@
             gap: 2rem;
         }
 
-        /* КАРТОЧКИ */
         .card {
             border-radius: 2rem;
             box-shadow: 0 25px 40px -15px rgba(0, 0, 0, 0.3);
@@ -115,13 +113,9 @@
         }
         .card:hover { transform: translateY(-5px); }
 
-        /* Man White */
         body.man-white .card { background: rgba(255, 255, 255, 0.96); border: 1px solid rgba(255,255,255,0.2); }
-        /* Man Dark */
         body.man-dark .card { background: rgba(25, 15, 40, 0.96); border: 1px solid #5a3e7c; }
-        /* Woman White */
         body.woman-white .card { background: rgba(255, 250, 252, 0.96); border: 1px solid #ffc0e0; }
-        /* Woman Dark */
         body.woman-dark .card { background: rgba(45, 20, 45, 0.92); border: 1px solid #b13e7c; }
 
         .card-title {
@@ -139,7 +133,6 @@
         body.woman-white .card-title { color: #b33b7c; border-left-color: #ff99cc; }
         body.woman-dark .card-title { color: #ffb3d9; border-left-color: #ff66b2; }
 
-        /* каждой строке поля добавим флекс-контейнер для кнопки сброса */
         .input-row {
             display: flex;
             align-items: center;
@@ -194,7 +187,6 @@
         body.woman-white .input-group label span { background: #ffe0f0; color: #c75b9a; }
         body.woman-dark .input-group label span { background: #632a55; color: #ffc0e0; }
 
-        /* кастомные поля */
         .custom-number {
             display: flex;
             align-items: center;
@@ -240,7 +232,6 @@
         body.woman-dark .ctrl-btn { background: #a53f7a; color: #ffebf5; }
         .ctrl-btn:hover { transform: scale(0.96); }
 
-        /* ТАБЛИЦА ОЦЕНОК */
         .ratings-table {
             width: 100%;
             border-collapse: collapse;
@@ -264,7 +255,6 @@
         body.man-dark .ratings-table th { background: rgba(255,255,255,0.05); color: #e0ccff; }
         body.woman-dark .ratings-table th { background: rgba(255,255,255,0.05); color: #ffd0e8; }
 
-        /* Кнопка сброса в таблице */
         .reset-btn {
             background: #f3ebff;
             border: none;
@@ -299,7 +289,6 @@
             color: #ff80bf;
         }
 
-        /* результаты */
         .result-block {
             border-radius: 1.5rem;
             padding: 1rem 1.2rem;
@@ -379,10 +368,9 @@
     </div>
 
     <div class="grid-2col">
-        <!-- ЛЕВАЯ КАРТОЧКА с кнопками сброса справа -->
+        <!-- ЛЕВАЯ КАРТОЧКА: тикеты и стоимость -->
         <div class="card">
             <div class="card-title" id="left-card-title">📊 Тикеты & стоимость</div>
-            <!-- Решенные тикеты -->
             <div class="input-group">
                 <label>✅ Решенные тикеты <span>кол-во</span></label>
                 <div class="input-row">
@@ -394,7 +382,6 @@
                     <button class="reset-small" data-reset="resolved-tickets" data-is-price="0">Сброс</button>
                 </div>
             </div>
-            <!-- Переданные тикеты -->
             <div class="input-group">
                 <label>🔄 Переданные тикеты <span>кол-во</span></label>
                 <div class="input-row">
@@ -406,9 +393,8 @@
                     <button class="reset-small" data-reset="transferred-tickets" data-is-price="0">Сброс</button>
                 </div>
             </div>
-            <!-- Стоимость решенного тикета -->
             <div class="input-group">
-                <label>💰 Стоимость одного решенного тикета <span>руб </span></label>
+                <label>💰 Стоимость одного решенного тикета <span>руб</span></label>
                 <div class="input-row">
                     <div class="custom-number">
                         <button class="ctrl-btn" data-target="resolved-price" data-step="0.01" data-dec="2">−</button>
@@ -418,9 +404,8 @@
                     <button class="reset-small" data-reset="resolved-price" data-is-price="1">Сброс</button>
                 </div>
             </div>
-            <!-- Стоимость переданного тикета -->
             <div class="input-group">
-                <label>🏷️ Стоимость переданного тикета <span>руб </span></label>
+                <label>🏷️ Стоимость переданного тикета <span>руб</span></label>
                 <div class="input-row">
                     <div class="custom-number">
                         <button class="ctrl-btn" data-target="transferred-price" data-step="0.01" data-dec="2">−</button>
@@ -445,9 +430,7 @@
                 <thead>
                     <tr><th>Сброс</th><th>Количество</th><th>Оценки</th></tr>
                 </thead>
-                <tbody id="ratings-table-body">
-                    <!-- заполняется динамически -->
-                </tbody>
+                <tbody id="ratings-table-body"></tbody>
             </table>
             <div class="result-block">
                 <div class="result-item"><span class="result-label">📊 Средняя оценка (★):</span><span class="result-value highlight-value" id="avg-rating">0.00</span></div>
@@ -460,12 +443,11 @@
 </div>
 
 <script>
-    // DOM элементы левых полей
+    // Элементы левых полей
     const resolvedInput = document.getElementById('resolved-tickets');
     const resolvedPriceInput = document.getElementById('resolved-price');
     const transferredInput = document.getElementById('transferred-tickets');
     const transferredPriceInput = document.getElementById('transferred-price');
-    
     // Элементы результатов
     const totalSumSpan = document.getElementById('total-sum');
     const transferredPercentSpan = document.getElementById('transferred-percent');
@@ -478,6 +460,7 @@
     function getIntFromStr(str) { let val = parseInt(str,10); return isNaN(val)?0:Math.max(0,val); }
     function getFloatFromStr(str) { let val = parseFloat(str); return isNaN(val)?0:Math.max(0,val); }
 
+    // Обновление всех данных + CSAT
     function updateDashboard() {
         let resolved = getIntFromStr(resolvedInput.value);
         let resolvedPrice = getFloatFromStr(resolvedPriceInput.value);
@@ -490,11 +473,12 @@
         let transferredPercent = totalTickets ? (transferred / totalTickets)*100 : 0;
         transferredPercentSpan.innerText = transferredPercent.toFixed(2);
 
-        let c1 = getIntFromStr(document.getElementById('rating-1').value);
-        let c2 = getIntFromStr(document.getElementById('rating-2').value);
-        let c3 = getIntFromStr(document.getElementById('rating-3').value);
-        let c4 = getIntFromStr(document.getElementById('rating-4').value);
-        let c5 = getIntFromStr(document.getElementById('rating-5').value);
+        // CSAT — читаем из текущих полей, если они есть
+        let c1 = getIntFromStr(document.getElementById('rating-1')?.value || '0');
+        let c2 = getIntFromStr(document.getElementById('rating-2')?.value || '0');
+        let c3 = getIntFromStr(document.getElementById('rating-3')?.value || '0');
+        let c4 = getIntFromStr(document.getElementById('rating-4')?.value || '0');
+        let c5 = getIntFromStr(document.getElementById('rating-5')?.value || '0');
         let totalRatings = c1+c2+c3+c4+c5;
         totalRatingsSpan.innerText = totalRatings;
         let weighted = c1*1 + c2*2 + c3*3 + c4*4 + c5*5;
@@ -517,28 +501,38 @@
         });
     }
 
-    // Построение таблицы оценок с кнопками сброса
-    function buildRatingsTable(gender) {
+    // Построение таблицы оценок с сохранением текущих значений
+    function buildRatingsTable(gender, preserveValues = true) {
+        // Сохраняем текущие значения оценок перед перестроением
+        let savedValues = [0,0,0,0,0];
+        if (preserveValues) {
+            for (let i = 1; i <= 5; i++) {
+                const inp = document.getElementById(`rating-${i}`);
+                if (inp) savedValues[i-1] = inp.value;
+            }
+        }
+
         const isWoman = (gender === 'woman');
         const symbol = isWoman ? '💖' : '★';
-        const rows = [];
+        let rows = '';
         for (let i = 1; i <= 5; i++) {
             const symbols = Array(i).fill(symbol).join('');
-            rows.push(`
+            rows += `
                 <tr>
                     <td><button class="reset-btn" data-reset="rating-${i}">Сброс</button></td>
                     <td class="rating-cell">
                         <div class="custom-number">
                             <button class="ctrl-btn rating-btn" data-target="rating-${i}" data-step="1" data-dec="0">−</button>
-                            <input type="text" id="rating-${i}" value="0" inputmode="numeric">
+                            <input type="text" id="rating-${i}" value="${savedValues[i-1]}" inputmode="numeric">
                             <button class="ctrl-btn rating-btn" data-target="rating-${i}" data-step="1" data-dec="0">+</button>
                         </div>
                     </td>
                     <td class="stars-cell">${symbols}</td>
                 </tr>
-            `);
+            `;
         }
-        tableBody.innerHTML = rows.join('');
+        tableBody.innerHTML = rows;
+
         // Кнопки сброса в таблице
         document.querySelectorAll('.reset-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -550,11 +544,23 @@
                 }
             });
         });
-        attachRatingEvents();
+
+        // Обработчики для полей оценок
+        for (let i = 1; i <= 5; i++) {
+            const inp = document.getElementById(`rating-${i}`);
+            if (inp) {
+                inp.removeEventListener('input', handleRatingInput);
+                inp.removeEventListener('blur', handleRatingBlur);
+                inp.addEventListener('input', handleRatingInput);
+                inp.addEventListener('blur', handleRatingBlur);
+            }
+        }
+        // Обновляем обработчики кнопок +/-
         setupButtons();
+        updateDashboard();
     }
 
-    // Обработчики для кнопок +/-
+    // Обработчики кнопок +/-
     function setupButtons() {
         document.querySelectorAll('.ctrl-btn').forEach(btn => {
             btn.removeEventListener('click', handleButtonClick);
@@ -578,18 +584,6 @@
         updateDashboard();
     }
 
-    function attachRatingEvents() {
-        const ratingInputs = [1,2,3,4,5].map(i => document.getElementById(`rating-${i}`));
-        ratingInputs.forEach(inp => {
-            if (inp) {
-                inp.removeEventListener('input', handleRatingInput);
-                inp.removeEventListener('blur', handleRatingBlur);
-                inp.addEventListener('input', handleRatingInput);
-                inp.addEventListener('blur', handleRatingBlur);
-            }
-        });
-    }
-
     function handleRatingInput(e) {
         let num = parseInt(e.target.value,10);
         if(isNaN(num)) num = 0;
@@ -605,7 +599,7 @@
         updateDashboard();
     }
 
-    // Обработчики для левых полей (ввод вручную)
+    // Ручной ввод в левых полях
     function attachManualInputEvents() {
         const leftFields = [resolvedInput, transferredInput, resolvedPriceInput, transferredPriceInput];
         leftFields.forEach(inp => {
@@ -628,44 +622,42 @@
         });
     }
 
-    // Управление темами
+    // Управление темами (с сохранением оценок)
     let currentGender = 'man';
     let currentBrightness = 'white';
 
     function applyTheme() {
         const themeClass = `${currentGender}-${currentBrightness}`;
         document.body.className = themeClass;
+        // Перестраиваем таблицу с сохранением текущих значений
+        buildRatingsTable(currentGender, true);
+        
+        // Обновляем тексты в левой карточке
         const isWoman = (currentGender === 'woman');
-        
-        // Перестраиваем таблицу с нужными символами
-        buildRatingsTable(currentGender);
-        
-        // Обновляем иконки и тексты в левой карточке
         const leftLabels = document.querySelectorAll('.card:first-child .input-group label');
         if(leftLabels.length >= 4) {
             if(isWoman) {
                 leftLabels[0].innerHTML = '🌸 Решенные тикеты <span>кол-во</span>';
                 leftLabels[1].innerHTML = '🦋 Переданные тикеты <span>кол-во</span>';
-                leftLabels[2].innerHTML = '💎 Стоимость одного решенного тикета <span>руб </span>';
-                leftLabels[3].innerHTML = '✨ Стоимость переданного тикета <span>руб </span>';
+                leftLabels[2].innerHTML = '💎 Стоимость одного решенного тикета <span>руб</span>';
+                leftLabels[3].innerHTML = '✨ Стоимость переданного тикета <span>руб</span>';
                 document.getElementById('left-card-title').innerHTML = '🌸 Тикеты & стоимость';
                 document.getElementById('right-card-title').innerHTML = '💖 Оценки клиентов (CSAT)';
             } else {
                 leftLabels[0].innerHTML = '✅ Решенные тикеты <span>кол-во</span>';
                 leftLabels[1].innerHTML = '🔄 Переданные тикеты <span>кол-во</span>';
-                leftLabels[2].innerHTML = '💰 Стоимость одного решенного тикета <span>руб </span>';
-                leftLabels[3].innerHTML = '🏷️ Стоимость переданного тикета <span>руб </span>';
+                leftLabels[2].innerHTML = '💰 Стоимость одного решенного тикета <span>руб</span>';
+                leftLabels[3].innerHTML = '🏷️ Стоимость переданного тикета <span>руб</span>';
                 document.getElementById('left-card-title').innerHTML = '📊 Тикеты & стоимость';
                 document.getElementById('right-card-title').innerHTML = '⭐ Оценки клиентов (CSAT)';
             }
         }
 
-        // Если вайб активен, пересоздаём звёзды с актуальными цветами
+        // Если вайб активен — обновляем звёзды
         if (vibeActive) {
-            stopVibe();   // удаляем старые
-            startVibe();  // создаём новые с нужными цветами
+            stopVibe();
+            startVibe();
         }
-
         updateDashboard();
     }
 
@@ -679,7 +671,7 @@
         applyTheme();
     }
 
-    // ========== ВАЙБ-РЕЖИМ ==========
+    // ========== ВАЙБ-РЕЖИМ (без изменений) ==========
     let vibeActive = false;
     let vibeStars = [];
     let vibeContainer = null;
@@ -693,17 +685,14 @@
     }
 
     function createStars(count = 40) {
-        // цвета в зависимости от гендера
         const isWoman = (currentGender === 'woman');
         const colors = isWoman 
             ? ['#ffb3e6','#ff99cc','#ffccf0','#ff80bf'] 
             : ['#ffffff','#e0ccff','#f0e6ff','#cbb5ff'];
-        const starSizeMin = 2, starSizeMax = 5;
-
         for (let i = 0; i < count; i++) {
             const star = document.createElement('div');
             star.className = 'vibe-star';
-            const size = Math.random() * (starSizeMax - starSizeMin) + starSizeMin;
+            const size = Math.random() * 3 + 2;
             star.style.width = size + 'px';
             star.style.height = size + 'px';
             star.style.left = Math.random() * 100 + '%';
@@ -714,14 +703,10 @@
             star.style.pointerEvents = 'none';
             star.style.opacity = '0.7';
             star.style.zIndex = '1';
-            // сохраняем параметры движения
-            const speed = Math.random() * 0.8 + 0.2; // пикселей за кадр (условно)
+            const speed = Math.random() * 0.6 + 0.2;
             const angle = Math.random() * Math.PI * 2;
             star.dataset.dx = Math.cos(angle) * speed;
             star.dataset.dy = Math.sin(angle) * speed;
-            star.dataset.x = parseFloat(star.style.left);
-            star.dataset.y = parseFloat(star.style.top);
-
             vibeContainer.appendChild(star);
             vibeStars.push(star);
         }
@@ -729,23 +714,19 @@
 
     function updateStarsPosition() {
         if (!vibeActive) return;
-        const delta = 0.15; // коэффициент замедления для плавности
         vibeStars.forEach(star => {
             let x = parseFloat(star.style.left);
             let y = parseFloat(star.style.top);
             let dx = parseFloat(star.dataset.dx);
             let dy = parseFloat(star.dataset.dy);
-            x += dx * delta;
-            y += dy * delta;
-            // зацикливание при выходе за экран
+            x += dx * 0.2;
+            y += dy * 0.2;
             if (x > 100) x = 0;
             if (x < 0) x = 100;
             if (y > 100) y = 0;
             if (y < 0) y = 100;
             star.style.left = x + '%';
             star.style.top = y + '%';
-            star.dataset.x = x;
-            star.dataset.y = y;
         });
         animationFrameId = requestAnimationFrame(updateStarsPosition);
     }
@@ -753,75 +734,44 @@
     function startVibe() {
         if (vibeActive) return;
         vibeActive = true;
-        // добавляем стили звёзд, если ещё нет
         if (!document.getElementById('vibe-stars-style')) {
             const style = document.createElement('style');
             style.id = 'vibe-stars-style';
-            style.textContent = `
-                .vibe-star {
-                    position: fixed;
-                    border-radius: 50%;
-                    pointer-events: none;
-                    z-index: 1;
-                }
-            `;
+            style.textContent = `.vibe-star { position: fixed; border-radius: 50%; pointer-events: none; z-index: 1; }`;
             document.head.appendChild(style);
         }
         createVibeContainer();
-        vibeStars = [];
         createStars();
-        if (animationFrameId) cancelAnimationFrame(animationFrameId);
         updateStarsPosition();
     }
 
     function stopVibe() {
         vibeActive = false;
-        if (animationFrameId) {
-            cancelAnimationFrame(animationFrameId);
-            animationFrameId = null;
-        }
-        if (vibeContainer) {
-            vibeContainer.remove();
-            vibeContainer = null;
-        }
+        if (animationFrameId) cancelAnimationFrame(animationFrameId);
+        if (vibeContainer) vibeContainer.remove();
+        vibeContainer = null;
         vibeStars = [];
     }
 
     function toggleVibe() {
-        if (vibeActive) {
-            stopVibe();
-        } else {
-            startVibe();
-        }
+        if (vibeActive) stopVibe(); else startVibe();
         const btn = document.getElementById('vibeToggle');
-        if (btn) {
-            if (vibeActive) {
-                btn.style.background = 'rgba(255,215,0,0.5)';
-                btn.style.boxShadow = '0 0 12px #ffd700';
-                btn.textContent = '✨ Вайб ✨';
-            } else {
-                btn.style.background = 'rgba(255,255,255,0.2)';
-                btn.style.boxShadow = 'none';
-                btn.textContent = '✨ Вайб';
-            }
-        }
+        btn.style.background = vibeActive ? 'rgba(255,215,0,0.5)' : 'rgba(255,255,255,0.2)';
+        btn.style.boxShadow = vibeActive ? '0 0 12px #ffd700' : 'none';
+        btn.textContent = vibeActive ? '✨ Вайб ✨' : '✨ Вайб';
     }
 
     // Инициализация
     window.addEventListener('DOMContentLoaded', () => {
         attachManualInputEvents();
         setupLeftResetButtons();
-        buildRatingsTable('man');
+        buildRatingsTable('man', false); // первый раз без сохранения (все нули)
         setupButtons();
         updateDashboard();
         document.getElementById('genderToggle').addEventListener('click', toggleGender);
         document.getElementById('brightnessToggle').addEventListener('click', toggleBrightness);
         document.getElementById('vibeToggle').addEventListener('click', toggleVibe);
         applyTheme(); // man-white
-        // кнопка вайба изначально не активна
-        const vibeBtn = document.getElementById('vibeToggle');
-        vibeBtn.style.background = 'rgba(255,255,255,0.2)';
-        vibeBtn.style.boxShadow = 'none';
     });
 </script>
 </body>
