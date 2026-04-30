@@ -352,7 +352,7 @@
                 <input type="text" id="resolved-tickets" value="0" inputmode="numeric">
                 <button class="ctrl-btn" data-target="resolved-tickets" data-step="1" data-dec="0">+</button></div>
             </div>
-            <div class="input-group"><label>💰 Стоимость одного решенного тикета <span>руб / у.е.</span></label>
+            <div class="input-group"><label>💰 Стоимость одного решенного тикета <span>руб </span></label>
                 <div class="custom-number"><button class="ctrl-btn" data-target="resolved-price" data-step="0.01" data-dec="2">−</button>
                 <input type="text" id="resolved-price" value="0.00" inputmode="decimal">
                 <button class="ctrl-btn" data-target="resolved-price" data-step="0.01" data-dec="2">+</button></div>
@@ -362,7 +362,7 @@
                 <input type="text" id="transferred-tickets" value="0" inputmode="numeric">
                 <button class="ctrl-btn" data-target="transferred-tickets" data-step="1" data-dec="0">+</button></div>
             </div>
-            <div class="input-group"><label>🏷️ Стоимость переданного тикета <span>руб / у.е.</span></label>
+            <div class="input-group"><label>🏷️ Стоимость переданного тикета <span>руб </span></label>
                 <div class="custom-number"><button class="ctrl-btn" data-target="transferred-price" data-step="0.01" data-dec="2">−</button>
                 <input type="text" id="transferred-price" value="0.00" inputmode="decimal">
                 <button class="ctrl-btn" data-target="transferred-price" data-step="0.01" data-dec="2">+</button></div>
@@ -489,16 +489,16 @@
         if(leftLabels.length >= 4) {
             if(isWoman) {
                 leftLabels[0].innerHTML = '🌸 Решенные тикеты <span>кол-во</span>';
-                leftLabels[1].innerHTML = '💎 Стоимость одного решенного тикета <span>руб / у.е.</span>';
+                leftLabels[1].innerHTML = '💎 Стоимость одного решенного тикета <span>руб </span>';
                 leftLabels[2].innerHTML = '🦋 Переданные тикеты <span>кол-во</span>';
-                leftLabels[3].innerHTML = '✨ Стоимость переданного тикета <span>руб / у.е.</span>';
+                leftLabels[3].innerHTML = '✨ Стоимость переданного тикета <span>руб </span>';
                 document.getElementById('left-card-title').innerHTML = '🌸 Тикеты & стоимость';
                 document.getElementById('right-card-title').innerHTML = '💖 Оценки клиентов (CSAT)';
             } else {
                 leftLabels[0].innerHTML = '✅ Решенные тикеты <span>кол-во</span>';
-                leftLabels[1].innerHTML = '💰 Стоимость одного решенного тикета <span>руб / у.е.</span>';
+                leftLabels[1].innerHTML = '💰 Стоимость одного решенного тикета <span>руб </span>';
                 leftLabels[2].innerHTML = '🔄 Переданные тикеты <span>кол-во</span>';
-                leftLabels[3].innerHTML = '🏷️ Стоимость переданного тикета <span>руб / у.е.</span>';
+                leftLabels[3].innerHTML = '🏷️ Стоимость переданного тикета <span>руб </span>';
                 document.getElementById('left-card-title').innerHTML = '📊 Тикеты & стоимость';
                 document.getElementById('right-card-title').innerHTML = '⭐ Оценки клиентов (CSAT)';
             }
