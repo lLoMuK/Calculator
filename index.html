@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Support Analytics · Свободный ввод стоимости</title>
+    <title>Support Analytics · Postcall c поддержкой ЧЧ:ММ:СС</title>
     <style>
         * {
             margin: 0;
@@ -19,7 +19,7 @@
             position: relative;
         }
 
-        /* ФОНЫ */
+        /* ФОНЫ (общие для всех тем) */
         body.man-white, body.man-dark {
             background: radial-gradient(circle at 10% 20%, #0b0410 0%, #1a0b24 45%, #2e133f 100%);
         }
@@ -99,10 +99,17 @@
             background: rgba(255,255,255,0.4);
         }
 
-        .grid-2col {
+        .normal-mode {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 2rem;
+        }
+        .speed-mode {
+            display: none;
+        }
+        .speed-mode .card {
+            max-width: 800px;
+            margin: 0 auto;
         }
 
         .card {
@@ -113,9 +120,13 @@
         }
         .card:hover { transform: translateY(-5px); }
 
+        /* Man White */
         body.man-white .card { background: rgba(255, 255, 255, 0.96); border: 1px solid rgba(255,255,255,0.2); }
+        /* Man Dark */
         body.man-dark .card { background: rgba(25, 15, 40, 0.96); border: 1px solid #5a3e7c; }
+        /* Woman White */
         body.woman-white .card { background: rgba(255, 250, 252, 0.96); border: 1px solid #ffc0e0; }
+        /* Woman Dark */
         body.woman-dark .card { background: rgba(45, 20, 45, 0.92); border: 1px solid #b13e7c; }
 
         .card-title {
@@ -187,7 +198,6 @@
         body.woman-white .input-group label span { background: #ffe0f0; color: #c75b9a; }
         body.woman-dark .input-group label span { background: #632a55; color: #ffc0e0; }
 
-        /* Кастомные поля для кнопок +/- (только количество) */
         .custom-number {
             display: flex;
             align-items: center;
@@ -215,7 +225,6 @@
         body.man-dark .custom-number input { color: #f0e6ff; }
         body.woman-dark .custom-number input { color: #ffe0f0; }
 
-        /* Поля стоимости — только ручной ввод, пустые по умолчанию */
         .price-input {
             background: white;
             border: 2px solid #e2d5ff;
@@ -230,10 +239,7 @@
         body.man-dark .price-input { background: #1f142f; border-color: #7a5a9e; color: #f0e6ff; }
         body.woman-white .price-input { border-color: #ffc0e0; background: #fffafc; color: #a73c72; }
         body.woman-dark .price-input { background: #2d1a2d; border-color: #b13e7c; color: #ffd9ec; }
-        .price-input::placeholder {
-            color: #aaa;
-            font-size: 0.85rem;
-        }
+        .price-input::placeholder { color: #aaa; font-size: 0.85rem; }
 
         .ctrl-btn {
             width: 32px;
@@ -263,11 +269,8 @@
             text-align: center;
             border-bottom: 1px solid rgba(0,0,0,0.1);
         }
-        body.man-dark .ratings-table th, 
-        body.man-dark .ratings-table td { border-bottom-color: rgba(255,255,255,0.15); }
-        body.woman-dark .ratings-table th, 
-        body.woman-dark .ratings-table td { border-bottom-color: rgba(255,255,255,0.15); }
-
+        body.man-dark .ratings-table th, body.man-dark .ratings-table td { border-bottom-color: rgba(255,255,255,0.15); }
+        body.woman-dark .ratings-table th, body.woman-dark .ratings-table td { border-bottom-color: rgba(255,255,255,0.15); }
         .ratings-table th {
             font-weight: 700;
             font-size: 0.9rem;
@@ -275,7 +278,6 @@
         }
         body.man-dark .ratings-table th { background: rgba(255,255,255,0.05); color: #e0ccff; }
         body.woman-dark .ratings-table th { background: rgba(255,255,255,0.05); color: #ffd0e8; }
-
         .reset-btn {
             background: #f3ebff;
             border: none;
@@ -284,31 +286,16 @@
             font-weight: 600;
             font-size: 0.8rem;
             cursor: pointer;
-            transition: 0.1s;
         }
         body.man-dark .reset-btn { background: #4a2e6e; color: #f0e6ff; }
         body.woman-white .reset-btn { background: #ffe0f0; color: #db6dae; }
         body.woman-dark .reset-btn { background: #a53f7a; color: #ffebf5; }
         .reset-btn:hover { transform: scale(0.96); background: #e0ccff; }
 
-        .rating-cell .custom-number {
-            justify-content: center;
-            margin: 0 auto;
-            max-width: 130px;
-        }
-
-        .stars-cell {
-            font-size: 1.2rem;
-            letter-spacing: 3px;
-        }
-        body.man-white .stars-cell,
-        body.man-dark .stars-cell {
-            color: #ffcc00;
-        }
-        body.woman-white .stars-cell,
-        body.woman-dark .stars-cell {
-            color: #ff80bf;
-        }
+        .rating-cell .custom-number { justify-content: center; margin: 0 auto; max-width: 130px; }
+        .stars-cell { font-size: 1.2rem; letter-spacing: 3px; }
+        body.man-white .stars-cell, body.man-dark .stars-cell { color: #ffcc00; }
+        body.woman-white .stars-cell, body.woman-dark .stars-cell { color: #ff80bf; }
 
         .result-block {
             border-radius: 1.5rem;
@@ -343,28 +330,26 @@
         .result-value {
             font-weight: 800;
             font-size: 1.35rem;
-            background: white;
             padding: 0.2rem 0.9rem;
             border-radius: 40px;
             letter-spacing: 0.5px;
+            background: white;
             box-shadow: inset 0 0 0 1px #e9dbff;
         }
         body.man-dark .result-value { background: #2a1a3a; box-shadow: inset 0 0 0 1px #7a5a9e; color: #f0e6ff; }
-        body.woman-white .result-value { background: #ffffff; box-shadow: inset 0 0 0 1px #ffb3d9; }
+        body.woman-white .result-value { background: #ffffff; box-shadow: inset 0 0 0 1px #ffb3d9; color: #a13e77; }
         body.woman-dark .result-value { background: #3e1f3a; box-shadow: inset 0 0 0 1px #ff99cc; color: #ffc0e0; }
 
         .highlight-value {
-            background: linear-gradient(135deg, #ede2ff, #ffffff);
-            color: #631dba;
             font-size: 1.5rem;
         }
+        body.man-white .highlight-value { background: linear-gradient(135deg, #ede2ff, #ffffff); color: #631dba; }
         body.man-dark .highlight-value { background: linear-gradient(135deg, #3a2a4a, #1f142f); color: #e0ccff; }
         body.woman-white .highlight-value { background: linear-gradient(135deg, #ffe4f0, #fff0f7); color: #cd5c9e; }
         body.woman-dark .highlight-value { background: linear-gradient(135deg, #632a55, #3e1f3a); color: #ffcce6; }
 
         @media (max-width: 850px) {
-            .grid-2col { grid-template-columns: 1fr; }
-            .ratings-table th, .ratings-table td { padding: 0.5rem 0.2rem; }
+            .normal-mode { grid-template-columns: 1fr; }
             .rating-cell .custom-number { max-width: 110px; }
             .input-row { gap: 0.4rem; }
             .reset-small { padding: 0.2rem 0.5rem; font-size: 0.7rem; }
@@ -386,14 +371,13 @@
         <button id="genderToggle" class="toggle-btn">👫 Man/Woman</button>
         <button id="brightnessToggle" class="toggle-btn">☀️ Dark/White</button>
         <button id="vibeToggle" class="toggle-btn" style="background: rgba(255,215,0,0.3); box-shadow: 0 0 8px #ffd700;">✨ Вайб</button>
+        <button id="speedToggle" class="toggle-btn">⚡ Speed</button>
     </div>
 
-    <div class="grid-2col">
-        <!-- ЛЕВАЯ КАРТОЧКА -->
+    <!-- Обычный режим (тикеты + CSAT) -->
+    <div id="normalMode" class="normal-mode">
         <div class="card">
             <div class="card-title" id="left-card-title">📊 Тикеты & стоимость</div>
-            
-            <!-- Решенные тикеты (количество) -->
             <div class="input-group">
                 <label>✅ Решенные тикеты <span>кол-во</span></label>
                 <div class="input-row">
@@ -405,8 +389,6 @@
                     <button class="reset-small" data-reset="resolved-tickets" data-is-price="0">Сброс</button>
                 </div>
             </div>
-
-            <!-- Переданные тикеты (количество) -->
             <div class="input-group">
                 <label>🔄 Переданные тикеты <span>кол-во</span></label>
                 <div class="input-row">
@@ -418,19 +400,14 @@
                     <button class="reset-small" data-reset="transferred-tickets" data-is-price="0">Сброс</button>
                 </div>
             </div>
-
-            <!-- Стоимость одного решенного тикета (только ручной ввод, пустое поле) -->
             <div class="input-group">
                 <label>💰 Стоимость одного решенного тикета <span>руб</span></label>
-                <input type="text" id="resolved-price" class="price-input" value="" placeholder="Например: 125.50 или 99,99" inputmode="decimal">
+                <input type="text" id="resolved-price" class="price-input" value="" placeholder="Например: 125.50 или 99,99">
             </div>
-
-            <!-- Стоимость переданного тикета (только ручной ввод, пустое поле) -->
             <div class="input-group">
                 <label>🏷️ Стоимость переданного тикета <span>руб</span></label>
-                <input type="text" id="transferred-price" class="price-input" value="" placeholder="Например: 125.50 или 99,99" inputmode="decimal">
+                <input type="text" id="transferred-price" class="price-input" value="" placeholder="Например: 125.50 или 99,99">
             </div>
-
             <div class="result-block">
                 <div class="result-item"><span class="result-label">💰 Общий доход:</span><span class="result-value highlight-value" id="total-sum">0.00</span></div>
                 <div class="result-item"><span class="result-label">📈 Процент Эскалации:</span><span class="result-value" id="transferred-percent">0.00</span></div>
@@ -439,13 +416,10 @@
             <div class="footer-note" style="margin-top:0.8rem; text-align:left; font-size:0.75rem;">* Сумма = (решённые × цена реш.) + (переданные × цена передан.)<br>Цену можно вводить с точкой или запятой, поле может быть пустым (считается 0).</div>
         </div>
 
-        <!-- ПРАВАЯ КАРТОЧКА: таблица оценок -->
         <div class="card">
             <div class="card-title" id="right-card-title">⭐ Оценки клиентов (CSAT)</div>
             <table class="ratings-table">
-                <thead>
-                    <tr><th>Сброс</th><th>Количество</th><th>Оценки</th></tr>
-                </thead>
+                <thead><tr><th>Сброс</th><th>Количество</th><th>Оценки</th></tr></thead>
                 <tbody id="ratings-table-body"></tbody>
             </table>
             <div class="result-block">
@@ -455,17 +429,125 @@
             <div class="footer-note" style="margin-top:0.8rem; font-size:0.75rem;">* Среднее взвешенное: (1×кол-во1 + … + 5×кол-во5) / общее кол-во оценок</div>
         </div>
     </div>
+
+    <!-- Режим скорости с умным вводом Postcall -->
+    <div id="speedMode" class="speed-mode">
+        <div class="card">
+            <div class="card-title">📈 Расчёт скорости</div>
+            <div class="input-group">
+                <label>📞 Количество звонков <span>шт.</span></label>
+                <div class="input-row">
+                    <div class="custom-number">
+                        <button class="ctrl-btn" data-target="calls-count" data-step="1" data-dec="0">−</button>
+                        <input type="text" id="calls-count" value="0" inputmode="numeric">
+                        <button class="ctrl-btn" data-target="calls-count" data-step="1" data-dec="0">+</button>
+                    </div>
+                    <button class="reset-small" data-reset="calls-count" data-is-price="0">Сброс</button>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>⏱️ Время в разговоре <span>сек</span></label>
+                <div class="input-row">
+                    <div class="custom-number">
+                        <button class="ctrl-btn" data-target="talk-time" data-step="1" data-dec="0">−</button>
+                        <input type="text" id="talk-time" value="0" inputmode="numeric">
+                        <button class="ctrl-btn" data-target="talk-time" data-step="1" data-dec="0">+</button>
+                    </div>
+                    <button class="reset-small" data-reset="talk-time" data-is-price="0">Сброс</button>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>✍️ Postcall <span>сек</span></label>
+                <div class="input-row">
+                    <div class="custom-number">
+                        <button class="ctrl-btn" data-target="postcall" data-step="1" data-dec="0">−</button>
+                        <input type="text" id="postcall" value="0" placeholder="01:17:07 или 1ч 55мин 33с" inputmode="text">
+                        <button class="ctrl-btn" data-target="postcall" data-step="1" data-dec="0">+</button>
+                    </div>
+                    <button class="reset-small" data-reset="postcall" data-is-price="0">Сброс</button>
+                </div>
+                <div class="footer-note" style="margin-top:0.4rem; font-size:0.7rem; text-align:left;">Поддерживаются форматы: <strong>01:17:07</strong> (ЧЧ:ММ:СС), <strong>25:30</strong> (ММ:СС), <strong>1ч 55мин 33с</strong>, <strong>2h 30m 10s</strong> и просто число секунд.</div>
+            </div>
+            <div class="result-block">
+                <div class="result-item"><span class="result-label">📊 ПВО (сек/зв):</span><span class="result-value highlight-value" id="pvo-value">0.00</span></div>
+                <div class="result-item"><span class="result-label">⚡ Скорость (зв/ч):</span><span class="result-value highlight-value" id="speed-value">0.00</span></div>
+            </div>
+            <div class="footer-note" style="margin-top:0.8rem; font-size:0.75rem;">* ПВО = Postcall (сек) / Кол-во звонков<br>Скорость (зв/ч) = (Кол-во звонков × 3600) / (Время в разговоре + Postcall)</div>
+        </div>
+    </div>
+
     <div class="footer-note">✨ Все поля автоматически пересчитываются ✨</div>
 </div>
 
 <script>
-    // Элементы левых полей
+    // ========== УТИЛИТЫ ==========
+    function getIntFromStr(str) { let val = parseInt(str, 10); return isNaN(val) ? 0 : Math.max(0, val); }
+    function parsePrice(value) {
+        if (value === undefined || value === null) return 0;
+        let str = String(value).trim();
+        if (str === '') return 0;
+        str = str.replace(',', '.');
+        let num = parseFloat(str);
+        return isNaN(num) ? 0 : Math.max(0, num);
+    }
+
+    // Парсинг времени из строки: поддерживает "01:17:07", "25:30", "1ч 55мин 33с", "120" и т.п.
+    function parseTimeToSeconds(str) {
+        if (!str || typeof str !== 'string') return null;
+        let s = str.trim().toLowerCase();
+        if (s === '') return null;
+        
+        // Если строка состоит только из цифр и/или точки/запятой — считаем что это секунды
+        if (/^[\d.,]+$/.test(s)) {
+            let num = parseFloat(s.replace(',', '.'));
+            return isNaN(num) ? null : Math.max(0, num);
+        }
+        
+        // Попробуем распознать формат ЧЧ:ММ:СС или ММ:СС
+        let timeMatch = s.match(/^(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?$/);
+        if (timeMatch) {
+            let hours = parseInt(timeMatch[1], 10) || 0;
+            let minutes = parseInt(timeMatch[2], 10) || 0;
+            let seconds = parseInt(timeMatch[3], 10) || 0;
+            let total = hours * 3600 + minutes * 60 + seconds;
+            return total;
+        }
+        
+        // Формат с буквами (ч, мин, сек и т.п.)
+        let totalSec = 0;
+        const patterns = [
+            { regex: /(\d+(?:[.,]\d+)?)\s*ч\s*/, multiplier: 3600 },   // часы рус
+            { regex: /(\d+(?:[.,]\d+)?)\s*h\s*/, multiplier: 3600 },    // часы eng
+            { regex: /(\d+(?:[.,]\d+)?)\s*мин\s*/, multiplier: 60 },     // минуты рус
+            { regex: /(\d+(?:[.,]\d+)?)\s*m\s*/, multiplier: 60 },        // минуты eng (m)
+            { regex: /(\d+(?:[.,]\d+)?)\s*сек\s*/, multiplier: 1 },       // секунды рус
+            { regex: /(\d+(?:[.,]\d+)?)\s*с\s*/, multiplier: 1 },         // секунды рус кратко
+            { regex: /(\d+(?:[.,]\d+)?)\s*s\s*/, multiplier: 1 }          // секунды eng
+        ];
+        let found = false;
+        for (let p of patterns) {
+            let match = s.match(p.regex);
+            if (match && match[1]) {
+                let val = parseFloat(match[1].replace(',', '.'));
+                if (!isNaN(val)) {
+                    totalSec += val * p.multiplier;
+                    found = true;
+                }
+                s = s.replace(p.regex, ' ');
+            }
+        }
+        if (!found) {
+            let num = parseFloat(s.replace(',', '.'));
+            if (!isNaN(num)) return Math.max(0, num);
+        }
+        return totalSec;
+    }
+
+    // ========== ЭЛЕМЕНТЫ ==========
     const resolvedInput = document.getElementById('resolved-tickets');
-    const resolvedPriceInput = document.getElementById('resolved-price');
     const transferredInput = document.getElementById('transferred-tickets');
+    const resolvedPriceInput = document.getElementById('resolved-price');
     const transferredPriceInput = document.getElementById('transferred-price');
-    
-    // Элементы результатов
     const totalSumSpan = document.getElementById('total-sum');
     const transferredPercentSpan = document.getElementById('transferred-percent');
     const totalTicketsSpan = document.getElementById('total-tickets-count');
@@ -473,29 +555,29 @@
     const totalRatingsSpan = document.getElementById('total-ratings-count');
     const tableBody = document.getElementById('ratings-table-body');
 
-    // Утилиты: преобразование строки с запятой или точкой в число
-    function parsePrice(value) {
-        if (value === undefined || value === null) return 0;
-        let str = String(value).trim();
-        if (str === '') return 0;
-        // Заменяем запятую на точку
-        str = str.replace(',', '.');
-        let num = parseFloat(str);
-        return isNaN(num) ? 0 : Math.max(0, num);
+    const callsInput = document.getElementById('calls-count');
+    const talkTimeInput = document.getElementById('talk-time');
+    const postcallInput = document.getElementById('postcall');
+    const pvoSpan = document.getElementById('pvo-value');
+    const speedSpan = document.getElementById('speed-value');
+
+    // ========== ОБНОВЛЕНИЯ ==========
+    function updateSpeedDashboard() {
+        let calls = getIntFromStr(callsInput.value);
+        let talk = getIntFromStr(talkTimeInput.value);
+        let post = getIntFromStr(postcallInput.value);
+        let pvo = (calls > 0) ? (post / calls) : 0;
+        let totalTime = talk + post;
+        let speed = (totalTime > 0) ? (calls * 3600 / totalTime) : 0;
+        pvoSpan.innerText = pvo.toFixed(2);
+        speedSpan.innerText = speed.toFixed(2);
     }
 
-    function getIntFromStr(str) { 
-        let val = parseInt(str, 10); 
-        return isNaN(val) ? 0 : Math.max(0, val); 
-    }
-
-    // Обновление всех данных
     function updateDashboard() {
         let resolved = getIntFromStr(resolvedInput.value);
         let resolvedPrice = parsePrice(resolvedPriceInput.value);
         let transferred = getIntFromStr(transferredInput.value);
         let transferredPrice = parsePrice(transferredPriceInput.value);
-        
         let totalRevenue = (resolved * resolvedPrice) + (transferred * transferredPrice);
         totalSumSpan.innerText = totalRevenue.toFixed(2);
         let totalTickets = resolved + transferred;
@@ -503,7 +585,6 @@
         let transferredPercent = totalTickets ? (transferred / totalTickets) * 100 : 0;
         transferredPercentSpan.innerText = transferredPercent.toFixed(2);
 
-        // CSAT
         let c1 = getIntFromStr(document.getElementById('rating-1')?.value || '0');
         let c2 = getIntFromStr(document.getElementById('rating-2')?.value || '0');
         let c3 = getIntFromStr(document.getElementById('rating-3')?.value || '0');
@@ -516,20 +597,34 @@
         avgRatingSpan.innerText = avg.toFixed(2);
     }
 
-    // Форматирование цены при потере фокуса (запятая -> точка, два знака после запятой)
     function formatPriceInput(input) {
         let raw = input.value.trim();
-        if (raw === '') {
-            input.value = '';
-            updateDashboard();
-            return;
-        }
+        if (raw === '') { input.value = ''; updateDashboard(); return; }
         let num = parsePrice(raw);
         input.value = num.toFixed(2);
         updateDashboard();
     }
 
-    // Сброс только для количества тикетов (у стоимости кнопок сброса нет)
+    // Обработчик для Postcall: преобразует текст в секунды при потере фокуса
+    function handlePostcallInput() {
+        let raw = postcallInput.value.trim();
+        if (raw === '') {
+            postcallInput.value = '0';
+            updateSpeedDashboard();
+            return;
+        }
+        let seconds = parseTimeToSeconds(raw);
+        if (seconds !== null && !isNaN(seconds)) {
+            let intSec = Math.floor(seconds);
+            postcallInput.value = intSec;
+            updateSpeedDashboard();
+        } else {
+            // если не распозналось, оставляем как есть (пользователь может дописать)
+            // но при следующем blur попробуем снова
+        }
+    }
+
+    // ========== КНОПКИ СБРОСА ==========
     function setupLeftResetButtons() {
         document.querySelectorAll('.reset-small').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -539,12 +634,15 @@
                 if (targetInput && !isPrice) {
                     targetInput.value = '0';
                     updateDashboard();
+                    if (targetId === 'calls-count' || targetId === 'talk-time' || targetId === 'postcall') {
+                        updateSpeedDashboard();
+                    }
                 }
             });
         });
     }
 
-    // Построение таблицы CSAT с сохранением значений
+    // ========== ТАБЛИЦА CSAT ==========
     function buildRatingsTable(gender, preserveValues = true) {
         let savedValues = [0,0,0,0,0];
         if (preserveValues) {
@@ -558,33 +656,26 @@
         let rows = '';
         for (let i = 1; i <= 5; i++) {
             const symbols = Array(i).fill(symbol).join('');
-            rows += `
-                <tr>
-                    <td><button class="reset-btn" data-reset="rating-${i}">Сброс</button></td>
-                    <td class="rating-cell">
-                        <div class="custom-number">
-                            <button class="ctrl-btn rating-btn" data-target="rating-${i}" data-step="1" data-dec="0">−</button>
-                            <input type="text" id="rating-${i}" value="${savedValues[i-1]}" inputmode="numeric">
-                            <button class="ctrl-btn rating-btn" data-target="rating-${i}" data-step="1" data-dec="0">+</button>
-                        </div>
-                    </td>
-                    <td class="stars-cell">${symbols}</td>
-                 </tr>
-            `;
+            rows += `<tr>
+                        <td><button class="reset-btn" data-reset="rating-${i}">Сброс</button></td>
+                        <td class="rating-cell">
+                            <div class="custom-number">
+                                <button class="ctrl-btn rating-btn" data-target="rating-${i}" data-step="1" data-dec="0">−</button>
+                                <input type="text" id="rating-${i}" value="${savedValues[i-1]}" inputmode="numeric">
+                                <button class="ctrl-btn rating-btn" data-target="rating-${i}" data-step="1" data-dec="0">+</button>
+                            </div>
+                        </td>
+                        <td class="stars-cell">${symbols}</td>
+                    </tr>`;
         }
         tableBody.innerHTML = rows;
-
         document.querySelectorAll('.reset-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const targetId = btn.getAttribute('data-reset');
                 const inputField = document.getElementById(targetId);
-                if (inputField) {
-                    inputField.value = '0';
-                    updateDashboard();
-                }
+                if (inputField) { inputField.value = '0'; updateDashboard(); }
             });
         });
-
         for (let i = 1; i <= 5; i++) {
             const inp = document.getElementById(`rating-${i}`);
             if (inp) {
@@ -598,6 +689,22 @@
         updateDashboard();
     }
 
+    function handleRatingInput(e) {
+        let num = parseInt(e.target.value, 10);
+        if (isNaN(num)) num = 0;
+        if (num < 0) num = 0;
+        e.target.value = num;
+        updateDashboard();
+    }
+    function handleRatingBlur(e) {
+        let num = parseInt(e.target.value, 10);
+        if (isNaN(num)) num = 0;
+        if (num < 0) num = 0;
+        e.target.value = num;
+        updateDashboard();
+    }
+
+    // ========== КНОПКИ + / - ==========
     function setupButtons() {
         document.querySelectorAll('.ctrl-btn').forEach(btn => {
             btn.removeEventListener('click', handleButtonClick);
@@ -617,28 +724,19 @@
         let current = (decimals === 0) ? getIntFromStr(targetInput.value) : parsePrice(targetInput.value);
         let newVal = current + (isMinus ? -step : step);
         if (newVal < 0) newVal = 0;
-        targetInput.value = (decimals === 0) ? Math.floor(newVal) : newVal.toFixed(decimals);
+        if (decimals === 0) {
+            targetInput.value = Math.floor(newVal);
+        } else {
+            targetInput.value = newVal.toFixed(decimals);
+        }
         updateDashboard();
+        if (targetId === 'calls-count' || targetId === 'talk-time' || targetId === 'postcall') {
+            updateSpeedDashboard();
+        }
     }
 
-    function handleRatingInput(e) {
-        let num = parseInt(e.target.value, 10);
-        if (isNaN(num)) num = 0;
-        if (num < 0) num = 0;
-        e.target.value = num;
-        updateDashboard();
-    }
-    function handleRatingBlur(e) {
-        let num = parseInt(e.target.value, 10);
-        if (isNaN(num)) num = 0;
-        if (num < 0) num = 0;
-        e.target.value = num;
-        updateDashboard();
-    }
-
-    // Ручной ввод для всех левых полей
+    // ========== РУЧНОЙ ВВОД ==========
     function attachManualInputEvents() {
-        // Поля количества
         const countFields = [resolvedInput, transferredInput];
         countFields.forEach(inp => {
             inp.addEventListener('input', function() {
@@ -656,20 +754,63 @@
                 updateDashboard();
             });
         });
-        
-        // Поля стоимости — при вводе только пересчитываем, не меняем формат
         const priceFields = [resolvedPriceInput, transferredPriceInput];
         priceFields.forEach(inp => {
+            inp.addEventListener('input', () => updateDashboard());
+            inp.addEventListener('blur', function() { formatPriceInput(this); });
+        });
+        // Поля режима скорости: calls и talkTime — только целые числа
+        const simpleSpeedFields = [callsInput, talkTimeInput];
+        simpleSpeedFields.forEach(inp => {
             inp.addEventListener('input', function() {
-                updateDashboard();
+                let num = parseInt(this.value, 10);
+                if (isNaN(num)) num = 0;
+                if (num < 0) num = 0;
+                this.value = num;
+                updateSpeedDashboard();
             });
             inp.addEventListener('blur', function() {
-                formatPriceInput(this);
+                let num = parseInt(this.value, 10);
+                if (isNaN(num)) num = 0;
+                if (num < 0) num = 0;
+                this.value = num;
+                updateSpeedDashboard();
             });
+        });
+        // Postcall с поддержкой текстового ввода времени
+        postcallInput.addEventListener('blur', function() {
+            handlePostcallInput();
+        });
+        // При ручном вводе (input) не трогаем, только при потере фокуса парсим
+        postcallInput.addEventListener('input', function() {
+            // Если пользователь вводит число, сразу обновляем расчёты
+            let num = parseInt(this.value, 10);
+            if (!isNaN(num) && this.value.trim().match(/^\d+$/)) {
+                updateSpeedDashboard();
+            }
         });
     }
 
-    // Управление темами
+    // ========== ПЕРЕКЛЮЧЕНИЕ РЕЖИМОВ ==========
+    let speedModeActive = false;
+    const normalModeDiv = document.getElementById('normalMode');
+    const speedModeDiv = document.getElementById('speedMode');
+    const speedToggleBtn = document.getElementById('speedToggle');
+
+    function toggleSpeedMode() {
+        speedModeActive = !speedModeActive;
+        if (speedModeActive) {
+            normalModeDiv.style.display = 'none';
+            speedModeDiv.style.display = 'flex';
+            speedToggleBtn.textContent = '🔙 Back';
+        } else {
+            normalModeDiv.style.display = 'grid';
+            speedModeDiv.style.display = 'none';
+            speedToggleBtn.textContent = '⚡ Speed';
+        }
+    }
+
+    // ========== ТЕМЫ ==========
     let currentGender = 'man';
     let currentBrightness = 'white';
 
@@ -677,7 +818,6 @@
         const themeClass = `${currentGender}-${currentBrightness}`;
         document.body.className = themeClass;
         buildRatingsTable(currentGender, true);
-        
         const isWoman = (currentGender === 'woman');
         const leftLabels = document.querySelectorAll('.card:first-child .input-group label');
         if (leftLabels.length >= 4) {
@@ -697,36 +837,25 @@
                 document.getElementById('right-card-title').innerHTML = '⭐ Оценки клиентов (CSAT)';
             }
         }
-
-        if (vibeActive) {
-            stopVibe();
-            startVibe();
-        }
+        if (vibeActive) { stopVibe(); startVibe(); }
         updateDashboard();
+        updateSpeedDashboard();
     }
 
-    function toggleGender() {
-        currentGender = (currentGender === 'man') ? 'woman' : 'man';
-        applyTheme();
-    }
-    function toggleBrightness() {
-        currentBrightness = (currentBrightness === 'white') ? 'dark' : 'white';
-        applyTheme();
-    }
+    function toggleGender() { currentGender = (currentGender === 'man') ? 'woman' : 'man'; applyTheme(); }
+    function toggleBrightness() { currentBrightness = (currentBrightness === 'white') ? 'dark' : 'white'; applyTheme(); }
 
-    // Вайб-режим (без изменений)
+    // ========== ВАЙБ (без изменений) ==========
     let vibeActive = false;
     let vibeStars = [];
     let vibeContainer = null;
     let animationFrameId = null;
-
     function createVibeContainer() {
         vibeContainer = document.createElement('div');
         vibeContainer.id = 'vibe-container';
         vibeContainer.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; z-index:1; pointer-events:none;';
         document.body.appendChild(vibeContainer);
     }
-
     function createStars(count = 40) {
         const isWoman = (currentGender === 'woman');
         const colors = isWoman ? ['#ffb3e6','#ff99cc','#ffccf0','#ff80bf'] : ['#ffffff','#e0ccff','#f0e6ff','#cbb5ff'];
@@ -752,7 +881,6 @@
             vibeStars.push(star);
         }
     }
-
     function updateStarsPosition() {
         if (!vibeActive) return;
         vibeStars.forEach(star => {
@@ -771,7 +899,6 @@
         });
         animationFrameId = requestAnimationFrame(updateStarsPosition);
     }
-
     function startVibe() {
         if (vibeActive) return;
         vibeActive = true;
@@ -785,7 +912,6 @@
         createStars();
         updateStarsPosition();
     }
-
     function stopVibe() {
         vibeActive = false;
         if (animationFrameId) cancelAnimationFrame(animationFrameId);
@@ -793,7 +919,6 @@
         vibeContainer = null;
         vibeStars = [];
     }
-
     function toggleVibe() {
         if (vibeActive) stopVibe(); else startVibe();
         const btn = document.getElementById('vibeToggle');
@@ -802,17 +927,21 @@
         btn.textContent = vibeActive ? '✨ Вайб ✨' : '✨ Вайб';
     }
 
-    // Инициализация
+    // ========== СТАРТ ==========
     window.addEventListener('DOMContentLoaded', () => {
         attachManualInputEvents();
         setupLeftResetButtons();
         buildRatingsTable('man', false);
         setupButtons();
         updateDashboard();
+        updateSpeedDashboard();
         document.getElementById('genderToggle').addEventListener('click', toggleGender);
         document.getElementById('brightnessToggle').addEventListener('click', toggleBrightness);
         document.getElementById('vibeToggle').addEventListener('click', toggleVibe);
+        document.getElementById('speedToggle').addEventListener('click', toggleSpeedMode);
         applyTheme();
+        normalModeDiv.style.display = 'grid';
+        speedModeDiv.style.display = 'none';
     });
 </script>
 </body>
