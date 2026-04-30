@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Support Analytics · Кнопки сброса · Сохранение оценок</title>
+    <title>Support Analytics · Свободный ввод стоимости</title>
     <style>
         * {
             margin: 0;
@@ -19,7 +19,7 @@
             position: relative;
         }
 
-        /* ФОНЫ (без изменений) */
+        /* ФОНЫ */
         body.man-white, body.man-dark {
             background: radial-gradient(circle at 10% 20%, #0b0410 0%, #1a0b24 45%, #2e133f 100%);
         }
@@ -187,6 +187,7 @@
         body.woman-white .input-group label span { background: #ffe0f0; color: #c75b9a; }
         body.woman-dark .input-group label span { background: #632a55; color: #ffc0e0; }
 
+        /* Кастомные поля для кнопок +/- (только количество) */
         .custom-number {
             display: flex;
             align-items: center;
@@ -213,6 +214,26 @@
         }
         body.man-dark .custom-number input { color: #f0e6ff; }
         body.woman-dark .custom-number input { color: #ffe0f0; }
+
+        /* Поля стоимости — только ручной ввод, пустые по умолчанию */
+        .price-input {
+            background: white;
+            border: 2px solid #e2d5ff;
+            border-radius: 2rem;
+            padding: 0.55rem 1rem;
+            font-size: 1rem;
+            font-weight: 500;
+            width: 100%;
+            outline: none;
+            text-align: center;
+        }
+        body.man-dark .price-input { background: #1f142f; border-color: #7a5a9e; color: #f0e6ff; }
+        body.woman-white .price-input { border-color: #ffc0e0; background: #fffafc; color: #a73c72; }
+        body.woman-dark .price-input { background: #2d1a2d; border-color: #b13e7c; color: #ffd9ec; }
+        .price-input::placeholder {
+            color: #aaa;
+            font-size: 0.85rem;
+        }
 
         .ctrl-btn {
             width: 32px;
@@ -368,9 +389,11 @@
     </div>
 
     <div class="grid-2col">
-        <!-- ЛЕВАЯ КАРТОЧКА: тикеты и стоимость -->
+        <!-- ЛЕВАЯ КАРТОЧКА -->
         <div class="card">
             <div class="card-title" id="left-card-title">📊 Тикеты & стоимость</div>
+            
+            <!-- Решенные тикеты (количество) -->
             <div class="input-group">
                 <label>✅ Решенные тикеты <span>кол-во</span></label>
                 <div class="input-row">
@@ -382,6 +405,8 @@
                     <button class="reset-small" data-reset="resolved-tickets" data-is-price="0">Сброс</button>
                 </div>
             </div>
+
+            <!-- Переданные тикеты (количество) -->
             <div class="input-group">
                 <label>🔄 Переданные тикеты <span>кол-во</span></label>
                 <div class="input-row">
@@ -393,34 +418,25 @@
                     <button class="reset-small" data-reset="transferred-tickets" data-is-price="0">Сброс</button>
                 </div>
             </div>
+
+            <!-- Стоимость одного решенного тикета (только ручной ввод, пустое поле) -->
             <div class="input-group">
                 <label>💰 Стоимость одного решенного тикета <span>руб</span></label>
-                <div class="input-row">
-                    <div class="custom-number">
-                        <button class="ctrl-btn" data-target="resolved-price" data-step="0.01" data-dec="2">−</button>
-                        <input type="text" id="resolved-price" value="0.00" inputmode="decimal">
-                        <button class="ctrl-btn" data-target="resolved-price" data-step="0.01" data-dec="2">+</button>
-                    </div>
-                    <button class="reset-small" data-reset="resolved-price" data-is-price="1">Сброс</button>
-                </div>
+                <input type="text" id="resolved-price" class="price-input" value="" placeholder="Например: 125.50 или 99,99" inputmode="decimal">
             </div>
+
+            <!-- Стоимость переданного тикета (только ручной ввод, пустое поле) -->
             <div class="input-group">
                 <label>🏷️ Стоимость переданного тикета <span>руб</span></label>
-                <div class="input-row">
-                    <div class="custom-number">
-                        <button class="ctrl-btn" data-target="transferred-price" data-step="0.01" data-dec="2">−</button>
-                        <input type="text" id="transferred-price" value="0.00" inputmode="decimal">
-                        <button class="ctrl-btn" data-target="transferred-price" data-step="0.01" data-dec="2">+</button>
-                    </div>
-                    <button class="reset-small" data-reset="transferred-price" data-is-price="1">Сброс</button>
-                </div>
+                <input type="text" id="transferred-price" class="price-input" value="" placeholder="Например: 125.50 или 99,99" inputmode="decimal">
             </div>
+
             <div class="result-block">
                 <div class="result-item"><span class="result-label">💰 Общий доход:</span><span class="result-value highlight-value" id="total-sum">0.00</span></div>
                 <div class="result-item"><span class="result-label">📈 Процент Эскалации:</span><span class="result-value" id="transferred-percent">0.00</span></div>
                 <div class="result-item"><span class="result-label">📦 Всего звонков:</span><span class="result-value" id="total-tickets-count">0</span></div>
             </div>
-            <div class="footer-note" style="margin-top:0.8rem; text-align:left; font-size:0.75rem;">* Сумма = (решённые × цена реш.) + (переданные × цена передан.)</div>
+            <div class="footer-note" style="margin-top:0.8rem; text-align:left; font-size:0.75rem;">* Сумма = (решённые × цена реш.) + (переданные × цена передан.)<br>Цену можно вводить с точкой или запятой, поле может быть пустым (считается 0).</div>
         </div>
 
         <!-- ПРАВАЯ КАРТОЧКА: таблица оценок -->
@@ -448,6 +464,7 @@
     const resolvedPriceInput = document.getElementById('resolved-price');
     const transferredInput = document.getElementById('transferred-tickets');
     const transferredPriceInput = document.getElementById('transferred-price');
+    
     // Элементы результатов
     const totalSumSpan = document.getElementById('total-sum');
     const transferredPercentSpan = document.getElementById('transferred-percent');
@@ -456,54 +473,79 @@
     const totalRatingsSpan = document.getElementById('total-ratings-count');
     const tableBody = document.getElementById('ratings-table-body');
 
-    // Утилиты
-    function getIntFromStr(str) { let val = parseInt(str,10); return isNaN(val)?0:Math.max(0,val); }
-    function getFloatFromStr(str) { let val = parseFloat(str); return isNaN(val)?0:Math.max(0,val); }
+    // Утилиты: преобразование строки с запятой или точкой в число
+    function parsePrice(value) {
+        if (value === undefined || value === null) return 0;
+        let str = String(value).trim();
+        if (str === '') return 0;
+        // Заменяем запятую на точку
+        str = str.replace(',', '.');
+        let num = parseFloat(str);
+        return isNaN(num) ? 0 : Math.max(0, num);
+    }
 
-    // Обновление всех данных + CSAT
+    function getIntFromStr(str) { 
+        let val = parseInt(str, 10); 
+        return isNaN(val) ? 0 : Math.max(0, val); 
+    }
+
+    // Обновление всех данных
     function updateDashboard() {
         let resolved = getIntFromStr(resolvedInput.value);
-        let resolvedPrice = getFloatFromStr(resolvedPriceInput.value);
+        let resolvedPrice = parsePrice(resolvedPriceInput.value);
         let transferred = getIntFromStr(transferredInput.value);
-        let transferredPrice = getFloatFromStr(transferredPriceInput.value);
+        let transferredPrice = parsePrice(transferredPriceInput.value);
+        
         let totalRevenue = (resolved * resolvedPrice) + (transferred * transferredPrice);
         totalSumSpan.innerText = totalRevenue.toFixed(2);
         let totalTickets = resolved + transferred;
         totalTicketsSpan.innerText = totalTickets;
-        let transferredPercent = totalTickets ? (transferred / totalTickets)*100 : 0;
+        let transferredPercent = totalTickets ? (transferred / totalTickets) * 100 : 0;
         transferredPercentSpan.innerText = transferredPercent.toFixed(2);
 
-        // CSAT — читаем из текущих полей, если они есть
+        // CSAT
         let c1 = getIntFromStr(document.getElementById('rating-1')?.value || '0');
         let c2 = getIntFromStr(document.getElementById('rating-2')?.value || '0');
         let c3 = getIntFromStr(document.getElementById('rating-3')?.value || '0');
         let c4 = getIntFromStr(document.getElementById('rating-4')?.value || '0');
         let c5 = getIntFromStr(document.getElementById('rating-5')?.value || '0');
-        let totalRatings = c1+c2+c3+c4+c5;
+        let totalRatings = c1 + c2 + c3 + c4 + c5;
         totalRatingsSpan.innerText = totalRatings;
         let weighted = c1*1 + c2*2 + c3*3 + c4*4 + c5*5;
-        let avg = totalRatings ? weighted/totalRatings : 0;
+        let avg = totalRatings ? weighted / totalRatings : 0;
         avgRatingSpan.innerText = avg.toFixed(2);
     }
 
-    // Сброс для левых полей
+    // Форматирование цены при потере фокуса (запятая -> точка, два знака после запятой)
+    function formatPriceInput(input) {
+        let raw = input.value.trim();
+        if (raw === '') {
+            input.value = '';
+            updateDashboard();
+            return;
+        }
+        let num = parsePrice(raw);
+        input.value = num.toFixed(2);
+        updateDashboard();
+    }
+
+    // Сброс только для количества тикетов (у стоимости кнопок сброса нет)
     function setupLeftResetButtons() {
         document.querySelectorAll('.reset-small').forEach(btn => {
             btn.addEventListener('click', () => {
                 const targetId = btn.getAttribute('data-reset');
                 const isPrice = btn.getAttribute('data-is-price') === '1';
                 const targetInput = document.getElementById(targetId);
-                if (targetInput) {
-                    targetInput.value = isPrice ? '0.00' : '0';
+                if (targetInput && !isPrice) {
+                    targetInput.value = '0';
                     updateDashboard();
                 }
             });
         });
     }
 
-    // Построение таблицы оценок с сохранением текущих значений
+    // Построение таблицы CSAT с сохранением значений
     function buildRatingsTable(gender, preserveValues = true) {
-        // Сохраняем текущие значения оценок перед перестроением
         let savedValues = [0,0,0,0,0];
         if (preserveValues) {
             for (let i = 1; i <= 5; i++) {
@@ -511,7 +553,6 @@
                 if (inp) savedValues[i-1] = inp.value;
             }
         }
-
         const isWoman = (gender === 'woman');
         const symbol = isWoman ? '💖' : '★';
         let rows = '';
@@ -528,14 +569,13 @@
                         </div>
                     </td>
                     <td class="stars-cell">${symbols}</td>
-                </tr>
+                 </tr>
             `;
         }
         tableBody.innerHTML = rows;
 
-        // Кнопки сброса в таблице
         document.querySelectorAll('.reset-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', () => {
                 const targetId = btn.getAttribute('data-reset');
                 const inputField = document.getElementById(targetId);
                 if (inputField) {
@@ -545,7 +585,6 @@
             });
         });
 
-        // Обработчики для полей оценок
         for (let i = 1; i <= 5; i++) {
             const inp = document.getElementById(`rating-${i}`);
             if (inp) {
@@ -555,12 +594,10 @@
                 inp.addEventListener('blur', handleRatingBlur);
             }
         }
-        // Обновляем обработчики кнопок +/-
         setupButtons();
         updateDashboard();
     }
 
-    // Обработчики кнопок +/-
     function setupButtons() {
         document.querySelectorAll('.ctrl-btn').forEach(btn => {
             btn.removeEventListener('click', handleButtonClick);
@@ -573,70 +610,78 @@
         const btn = e.currentTarget;
         const targetId = btn.getAttribute('data-target');
         const step = parseFloat(btn.getAttribute('data-step'));
-        const decimals = parseInt(btn.getAttribute('data-dec'),10);
+        const decimals = parseInt(btn.getAttribute('data-dec'), 10);
         const isMinus = btn.textContent === '−';
         const targetInput = document.getElementById(targetId);
         if (!targetInput) return;
-        let current = (decimals===0) ? getIntFromStr(targetInput.value) : getFloatFromStr(targetInput.value);
+        let current = (decimals === 0) ? getIntFromStr(targetInput.value) : parsePrice(targetInput.value);
         let newVal = current + (isMinus ? -step : step);
-        if(newVal < 0) newVal = 0;
-        targetInput.value = (decimals===0) ? Math.floor(newVal) : newVal.toFixed(decimals);
+        if (newVal < 0) newVal = 0;
+        targetInput.value = (decimals === 0) ? Math.floor(newVal) : newVal.toFixed(decimals);
         updateDashboard();
     }
 
     function handleRatingInput(e) {
-        let num = parseInt(e.target.value,10);
-        if(isNaN(num)) num = 0;
-        if(num < 0) num = 0;
+        let num = parseInt(e.target.value, 10);
+        if (isNaN(num)) num = 0;
+        if (num < 0) num = 0;
         e.target.value = num;
         updateDashboard();
     }
     function handleRatingBlur(e) {
-        let num = parseInt(e.target.value,10);
-        if(isNaN(num)) num = 0;
-        if(num < 0) num = 0;
+        let num = parseInt(e.target.value, 10);
+        if (isNaN(num)) num = 0;
+        if (num < 0) num = 0;
         e.target.value = num;
         updateDashboard();
     }
 
-    // Ручной ввод в левых полях
+    // Ручной ввод для всех левых полей
     function attachManualInputEvents() {
-        const leftFields = [resolvedInput, transferredInput, resolvedPriceInput, transferredPriceInput];
-        leftFields.forEach(inp => {
+        // Поля количества
+        const countFields = [resolvedInput, transferredInput];
+        countFields.forEach(inp => {
             inp.addEventListener('input', function() {
-                let isPrice = (this.id === 'resolved-price' || this.id === 'transferred-price');
-                let num = isPrice ? parseFloat(this.value) : parseInt(this.value,10);
-                if(isNaN(num)) num = 0;
-                if(num < 0) num = 0;
-                this.value = isPrice ? num.toFixed(2) : num;
+                let num = parseInt(this.value, 10);
+                if (isNaN(num)) num = 0;
+                if (num < 0) num = 0;
+                this.value = num;
                 updateDashboard();
             });
             inp.addEventListener('blur', function() {
-                let isPrice = (this.id === 'resolved-price' || this.id === 'transferred-price');
-                let num = isPrice ? parseFloat(this.value) : parseInt(this.value,10);
-                if(isNaN(num)) num = 0;
-                if(num < 0) num = 0;
-                this.value = isPrice ? num.toFixed(2) : num;
+                let num = parseInt(this.value, 10);
+                if (isNaN(num)) num = 0;
+                if (num < 0) num = 0;
+                this.value = num;
                 updateDashboard();
+            });
+        });
+        
+        // Поля стоимости — при вводе только пересчитываем, не меняем формат
+        const priceFields = [resolvedPriceInput, transferredPriceInput];
+        priceFields.forEach(inp => {
+            inp.addEventListener('input', function() {
+                updateDashboard();
+            });
+            inp.addEventListener('blur', function() {
+                formatPriceInput(this);
             });
         });
     }
 
-    // Управление темами (с сохранением оценок)
+    // Управление темами
     let currentGender = 'man';
     let currentBrightness = 'white';
 
     function applyTheme() {
         const themeClass = `${currentGender}-${currentBrightness}`;
         document.body.className = themeClass;
-        // Перестраиваем таблицу с сохранением текущих значений
         buildRatingsTable(currentGender, true);
         
-        // Обновляем тексты в левой карточке
         const isWoman = (currentGender === 'woman');
         const leftLabels = document.querySelectorAll('.card:first-child .input-group label');
-        if(leftLabels.length >= 4) {
-            if(isWoman) {
+        if (leftLabels.length >= 4) {
+            if (isWoman) {
                 leftLabels[0].innerHTML = '🌸 Решенные тикеты <span>кол-во</span>';
                 leftLabels[1].innerHTML = '🦋 Переданные тикеты <span>кол-во</span>';
                 leftLabels[2].innerHTML = '💎 Стоимость одного решенного тикета <span>руб</span>';
@@ -653,7 +698,6 @@
             }
         }
 
-        // Если вайб активен — обновляем звёзды
         if (vibeActive) {
             stopVibe();
             startVibe();
@@ -665,13 +709,12 @@
         currentGender = (currentGender === 'man') ? 'woman' : 'man';
         applyTheme();
     }
-
     function toggleBrightness() {
         currentBrightness = (currentBrightness === 'white') ? 'dark' : 'white';
         applyTheme();
     }
 
-    // ========== ВАЙБ-РЕЖИМ (без изменений) ==========
+    // Вайб-режим (без изменений)
     let vibeActive = false;
     let vibeStars = [];
     let vibeContainer = null;
@@ -686,9 +729,7 @@
 
     function createStars(count = 40) {
         const isWoman = (currentGender === 'woman');
-        const colors = isWoman 
-            ? ['#ffb3e6','#ff99cc','#ffccf0','#ff80bf'] 
-            : ['#ffffff','#e0ccff','#f0e6ff','#cbb5ff'];
+        const colors = isWoman ? ['#ffb3e6','#ff99cc','#ffccf0','#ff80bf'] : ['#ffffff','#e0ccff','#f0e6ff','#cbb5ff'];
         for (let i = 0; i < count; i++) {
             const star = document.createElement('div');
             star.className = 'vibe-star';
@@ -765,13 +806,13 @@
     window.addEventListener('DOMContentLoaded', () => {
         attachManualInputEvents();
         setupLeftResetButtons();
-        buildRatingsTable('man', false); // первый раз без сохранения (все нули)
+        buildRatingsTable('man', false);
         setupButtons();
         updateDashboard();
         document.getElementById('genderToggle').addEventListener('click', toggleGender);
         document.getElementById('brightnessToggle').addEventListener('click', toggleBrightness);
         document.getElementById('vibeToggle').addEventListener('click', toggleVibe);
-        applyTheme(); // man-white
+        applyTheme();
     });
 </script>
 </body>
