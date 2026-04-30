@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Support Analytics · Postcall c поддержкой ЧЧ:ММ:СС</title>
+    <title>Support Analytics · Сохранение состояния</title>
     <style>
         * {
             margin: 0;
@@ -419,7 +419,7 @@
         <div class="card">
             <div class="card-title" id="right-card-title">⭐ Оценки клиентов (CSAT)</div>
             <table class="ratings-table">
-                <thead><tr><th>Сброс</th><th>Количество</th><th>Оценки</th></tr></thead>
+                <thead><tr><th>Сброс</th><th>Количество</th><th>Оценки</th><tr></thead>
                 <tbody id="ratings-table-body"></tbody>
             </table>
             <div class="result-block">
@@ -430,7 +430,7 @@
         </div>
     </div>
 
-    <!-- Режим скорости с умным вводом Postcall -->
+    <!-- Режим скорости с обновлёнными подписями -->
     <div id="speedMode" class="speed-mode">
         <div class="card">
             <div class="card-title">📈 Расчёт скорости</div>
@@ -446,7 +446,7 @@
                 </div>
             </div>
             <div class="input-group">
-                <label>⏱️ Время в разговоре <span>сек</span></label>
+                <label>⏱️ Время в разговоре (Суммарно) <span>сек</span></label>
                 <div class="input-row">
                     <div class="custom-number">
                         <button class="ctrl-btn" data-target="talk-time" data-step="1" data-dec="0">−</button>
@@ -457,7 +457,7 @@
                 </div>
             </div>
             <div class="input-group">
-                <label>✍️ Postcall <span>сек</span></label>
+                <label>✍️ Postcall (Суммарное ПВО) <span>сек</span></label>
                 <div class="input-row">
                     <div class="custom-number">
                         <button class="ctrl-btn" data-target="postcall" data-step="1" data-dec="0">−</button>
@@ -469,14 +469,14 @@
                 <div class="footer-note" style="margin-top:0.4rem; font-size:0.7rem; text-align:left;">Поддерживаются форматы: <strong>01:17:07</strong> (ЧЧ:ММ:СС), <strong>25:30</strong> (ММ:СС), <strong>1ч 55мин 33с</strong>, <strong>2h 30m 10s</strong> и просто число секунд.</div>
             </div>
             <div class="result-block">
-                <div class="result-item"><span class="result-label">📊 ПВО (сек/зв):</span><span class="result-value highlight-value" id="pvo-value">0.00</span></div>
+                <div class="result-item"><span class="result-label">📊 ПВО (среднее значение):</span><span class="result-value highlight-value" id="pvo-value">0.00</span></div>
                 <div class="result-item"><span class="result-label">⚡ Скорость (зв/ч):</span><span class="result-value highlight-value" id="speed-value">0.00</span></div>
             </div>
             <div class="footer-note" style="margin-top:0.8rem; font-size:0.75rem;">* ПВО = Postcall (сек) / Кол-во звонков<br>Скорость (зв/ч) = (Кол-во звонков × 3600) / (Время в разговоре + Postcall)</div>
         </div>
     </div>
 
-    <div class="footer-note">✨ Все поля автоматически пересчитываются ✨</div>
+    <div class="footer-note">✨ Все поля автоматически пересчитываются и сохраняются ✨</div>
 </div>
 
 <script>
@@ -491,38 +491,31 @@
         return isNaN(num) ? 0 : Math.max(0, num);
     }
 
-    // Парсинг времени из строки: поддерживает "01:17:07", "25:30", "1ч 55мин 33с", "120" и т.п.
+    // Парсинг времени из строки
     function parseTimeToSeconds(str) {
         if (!str || typeof str !== 'string') return null;
         let s = str.trim().toLowerCase();
         if (s === '') return null;
-        
-        // Если строка состоит только из цифр и/или точки/запятой — считаем что это секунды
         if (/^[\d.,]+$/.test(s)) {
             let num = parseFloat(s.replace(',', '.'));
             return isNaN(num) ? null : Math.max(0, num);
         }
-        
-        // Попробуем распознать формат ЧЧ:ММ:СС или ММ:СС
         let timeMatch = s.match(/^(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?$/);
         if (timeMatch) {
             let hours = parseInt(timeMatch[1], 10) || 0;
             let minutes = parseInt(timeMatch[2], 10) || 0;
             let seconds = parseInt(timeMatch[3], 10) || 0;
-            let total = hours * 3600 + minutes * 60 + seconds;
-            return total;
+            return hours * 3600 + minutes * 60 + seconds;
         }
-        
-        // Формат с буквами (ч, мин, сек и т.п.)
         let totalSec = 0;
         const patterns = [
-            { regex: /(\d+(?:[.,]\d+)?)\s*ч\s*/, multiplier: 3600 },   // часы рус
-            { regex: /(\d+(?:[.,]\d+)?)\s*h\s*/, multiplier: 3600 },    // часы eng
-            { regex: /(\d+(?:[.,]\d+)?)\s*мин\s*/, multiplier: 60 },     // минуты рус
-            { regex: /(\d+(?:[.,]\d+)?)\s*m\s*/, multiplier: 60 },        // минуты eng (m)
-            { regex: /(\d+(?:[.,]\d+)?)\s*сек\s*/, multiplier: 1 },       // секунды рус
-            { regex: /(\d+(?:[.,]\d+)?)\s*с\s*/, multiplier: 1 },         // секунды рус кратко
-            { regex: /(\d+(?:[.,]\d+)?)\s*s\s*/, multiplier: 1 }          // секунды eng
+            { regex: /(\d+(?:[.,]\d+)?)\s*ч\s*/, multiplier: 3600 },
+            { regex: /(\d+(?:[.,]\d+)?)\s*h\s*/, multiplier: 3600 },
+            { regex: /(\d+(?:[.,]\d+)?)\s*мин\s*/, multiplier: 60 },
+            { regex: /(\d+(?:[.,]\d+)?)\s*m\s*/, multiplier: 60 },
+            { regex: /(\d+(?:[.,]\d+)?)\s*сек\s*/, multiplier: 1 },
+            { regex: /(\d+(?:[.,]\d+)?)\s*с\s*/, multiplier: 1 },
+            { regex: /(\d+(?:[.,]\d+)?)\s*s\s*/, multiplier: 1 }
         ];
         let found = false;
         for (let p of patterns) {
@@ -561,6 +554,58 @@
     const pvoSpan = document.getElementById('pvo-value');
     const speedSpan = document.getElementById('speed-value');
 
+    // ========== LOCALSTORAGE ==========
+    const STORAGE_KEY = 'support_analytics_state';
+    function saveToLocalStorage() {
+        const state = {
+            resolvedTickets: resolvedInput.value,
+            transferredTickets: transferredInput.value,
+            resolvedPrice: resolvedPriceInput.value,
+            transferredPrice: transferredPriceInput.value,
+            callsCount: callsInput.value,
+            talkTime: talkTimeInput.value,
+            postcall: postcallInput.value,
+            ratings: {
+                1: document.getElementById('rating-1')?.value || '0',
+                2: document.getElementById('rating-2')?.value || '0',
+                3: document.getElementById('rating-3')?.value || '0',
+                4: document.getElementById('rating-4')?.value || '0',
+                5: document.getElementById('rating-5')?.value || '0'
+            },
+            currentGender: currentGender,
+            currentBrightness: currentBrightness,
+            speedModeActive: speedModeActive,
+            vibeActive: vibeActive
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function loadFromLocalStorage() {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (!saved) return false;
+        try {
+            const state = JSON.parse(saved);
+            resolvedInput.value = state.resolvedTickets || '0';
+            transferredInput.value = state.transferredTickets || '0';
+            resolvedPriceInput.value = state.resolvedPrice !== undefined ? state.resolvedPrice : '';
+            transferredPriceInput.value = state.transferredPrice !== undefined ? state.transferredPrice : '';
+            callsInput.value = state.callsCount || '0';
+            talkTimeInput.value = state.talkTime || '0';
+            postcallInput.value = state.postcall || '0';
+            if (state.ratings) {
+                for (let i = 1; i <= 5; i++) {
+                    const inp = document.getElementById(`rating-${i}`);
+                    if (inp) inp.value = state.ratings[i] || '0';
+                }
+            }
+            currentGender = state.currentGender === 'woman' ? 'woman' : 'man';
+            currentBrightness = state.currentBrightness === 'dark' ? 'dark' : 'white';
+            speedModeActive = state.speedModeActive === true;
+            vibeActive = state.vibeActive === true;
+            return true;
+        } catch(e) { return false; }
+    }
+
     // ========== ОБНОВЛЕНИЯ ==========
     function updateSpeedDashboard() {
         let calls = getIntFromStr(callsInput.value);
@@ -571,6 +616,7 @@
         let speed = (totalTime > 0) ? (calls * 3600 / totalTime) : 0;
         pvoSpan.innerText = pvo.toFixed(2);
         speedSpan.innerText = speed.toFixed(2);
+        saveToLocalStorage();
     }
 
     function updateDashboard() {
@@ -595,6 +641,7 @@
         let weighted = c1*1 + c2*2 + c3*3 + c4*4 + c5*5;
         let avg = totalRatings ? weighted / totalRatings : 0;
         avgRatingSpan.innerText = avg.toFixed(2);
+        saveToLocalStorage();
     }
 
     function formatPriceInput(input) {
@@ -605,7 +652,6 @@
         updateDashboard();
     }
 
-    // Обработчик для Postcall: преобразует текст в секунды при потере фокуса
     function handlePostcallInput() {
         let raw = postcallInput.value.trim();
         if (raw === '') {
@@ -618,9 +664,6 @@
             let intSec = Math.floor(seconds);
             postcallInput.value = intSec;
             updateSpeedDashboard();
-        } else {
-            // если не распозналось, оставляем как есть (пользователь может дописать)
-            // но при следующем blur попробуем снова
         }
     }
 
@@ -759,7 +802,6 @@
             inp.addEventListener('input', () => updateDashboard());
             inp.addEventListener('blur', function() { formatPriceInput(this); });
         });
-        // Поля режима скорости: calls и talkTime — только целые числа
         const simpleSpeedFields = [callsInput, talkTimeInput];
         simpleSpeedFields.forEach(inp => {
             inp.addEventListener('input', function() {
@@ -777,13 +819,10 @@
                 updateSpeedDashboard();
             });
         });
-        // Postcall с поддержкой текстового ввода времени
         postcallInput.addEventListener('blur', function() {
             handlePostcallInput();
         });
-        // При ручном вводе (input) не трогаем, только при потере фокуса парсим
         postcallInput.addEventListener('input', function() {
-            // Если пользователь вводит число, сразу обновляем расчёты
             let num = parseInt(this.value, 10);
             if (!isNaN(num) && this.value.trim().match(/^\d+$/)) {
                 updateSpeedDashboard();
@@ -808,6 +847,7 @@
             speedModeDiv.style.display = 'none';
             speedToggleBtn.textContent = '⚡ Speed';
         }
+        saveToLocalStorage();
     }
 
     // ========== ТЕМЫ ==========
@@ -840,12 +880,13 @@
         if (vibeActive) { stopVibe(); startVibe(); }
         updateDashboard();
         updateSpeedDashboard();
+        saveToLocalStorage();
     }
 
     function toggleGender() { currentGender = (currentGender === 'man') ? 'woman' : 'man'; applyTheme(); }
     function toggleBrightness() { currentBrightness = (currentBrightness === 'white') ? 'dark' : 'white'; applyTheme(); }
 
-    // ========== ВАЙБ (без изменений) ==========
+    // ========== ВАЙБ ==========
     let vibeActive = false;
     let vibeStars = [];
     let vibeContainer = null;
@@ -911,6 +952,7 @@
         createVibeContainer();
         createStars();
         updateStarsPosition();
+        saveToLocalStorage();
     }
     function stopVibe() {
         vibeActive = false;
@@ -918,6 +960,7 @@
         if (vibeContainer) vibeContainer.remove();
         vibeContainer = null;
         vibeStars = [];
+        saveToLocalStorage();
     }
     function toggleVibe() {
         if (vibeActive) stopVibe(); else startVibe();
@@ -929,19 +972,40 @@
 
     // ========== СТАРТ ==========
     window.addEventListener('DOMContentLoaded', () => {
+        // Загружаем сохранённое состояние
+        const hasSaved = loadFromLocalStorage();
+        // Инициализируем всё
         attachManualInputEvents();
         setupLeftResetButtons();
-        buildRatingsTable('man', false);
+        buildRatingsTable(currentGender, !hasSaved); // если нет сохранения, ставим нули
         setupButtons();
+        // Применяем темы и отображение режима
+        applyTheme();  // применит тему и восстановит таблицу с сохранёнными значениями
+        // Восстанавливаем режим скорости
+        if (speedModeActive) {
+            normalModeDiv.style.display = 'none';
+            speedModeDiv.style.display = 'flex';
+            speedToggleBtn.textContent = '🔙 Back';
+        } else {
+            normalModeDiv.style.display = 'grid';
+            speedModeDiv.style.display = 'none';
+            speedToggleBtn.textContent = '⚡ Speed';
+        }
+        // Восстанавливаем вайб
+        if (vibeActive) {
+            startVibe();
+            const btn = document.getElementById('vibeToggle');
+            btn.style.background = 'rgba(255,215,0,0.5)';
+            btn.style.boxShadow = '0 0 12px #ffd700';
+            btn.textContent = '✨ Вайб ✨';
+        }
         updateDashboard();
         updateSpeedDashboard();
+        // Добавляем обработчики для переключений (они уже есть, но повторно для сохранения)
         document.getElementById('genderToggle').addEventListener('click', toggleGender);
         document.getElementById('brightnessToggle').addEventListener('click', toggleBrightness);
         document.getElementById('vibeToggle').addEventListener('click', toggleVibe);
         document.getElementById('speedToggle').addEventListener('click', toggleSpeedMode);
-        applyTheme();
-        normalModeDiv.style.display = 'grid';
-        speedModeDiv.style.display = 'none';
     });
 </script>
 </body>
