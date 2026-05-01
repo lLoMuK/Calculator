@@ -402,6 +402,17 @@
                 </div>
             </div>
             <div class="input-group">
+                <label>📞 Звонки меньше 21с <span>кол-во</span></label>
+                <div class="input-row">
+                    <div class="custom-number">
+                        <button class="ctrl-btn" data-target="short-calls" data-step="1" data-dec="0">−</button>
+                        <input type="text" id="short-calls" value="0" inputmode="numeric">
+                        <button class="ctrl-btn" data-target="short-calls" data-step="1" data-dec="0">+</button>
+                    </div>
+                    <button class="reset-small" data-reset="short-calls" data-is-price="0">Сброс</button>
+                </div>
+            </div>
+            <div class="input-group">
                 <label>💰 Стоимость одного решенного тикета <span>руб</span></label>
                 <input type="text" id="resolved-price" class="price-input" value="" placeholder="Например: 125.50 или 99,99">
             </div>
@@ -414,7 +425,7 @@
                 <div class="result-item"><span class="result-label">📈 Процент Эскалации:</span><span class="result-value" id="transferred-percent">0.00</span></div>
                 <div class="result-item"><span class="result-label">📦 Всего звонков:</span><span class="result-value" id="total-tickets-count">0</span></div>
             </div>
-            <div class="footer-note" style="margin-top:0.8rem; text-align:left; font-size:0.75rem;">* Сумма = (решённые × цена реш.) + (переданные × цена передан.)<br>Цену можно вводить с точкой или запятой, поле может быть пустым (считается 0).</div>
+            <div class="footer-note" style="margin-top:0.8rem; text-align:left; font-size:0.75rem;">* Сумма = (решённые × цена реш.) + (переданные × цена передан.)<br>Цену можно вводить с точкой или запятой, поле может быть пустым (считается 0).<br>Звонки &lt;21с учитываются только в общем количестве, на доход не влияют.<br>Процент эскалации = (переданные / всего звонков) × 100</div>
         </div>
 
         <div class="card">
@@ -540,6 +551,7 @@
     // ========== ЭЛЕМЕНТЫ ==========
     const resolvedInput = document.getElementById('resolved-tickets');
     const transferredInput = document.getElementById('transferred-tickets');
+    const shortCallsInput = document.getElementById('short-calls');
     const resolvedPriceInput = document.getElementById('resolved-price');
     const transferredPriceInput = document.getElementById('transferred-price');
     const totalSumSpan = document.getElementById('total-sum');
@@ -571,6 +583,7 @@
         const state = {
             resolvedTickets: resolvedInput.value,
             transferredTickets: transferredInput.value,
+            shortCalls: shortCallsInput.value,
             resolvedPrice: resolvedPriceInput.value,
             transferredPrice: transferredPriceInput.value,
             callsCount: callsInput.value,
@@ -592,6 +605,7 @@
             const state = JSON.parse(saved);
             resolvedInput.value = state.resolvedTickets || '0';
             transferredInput.value = state.transferredTickets || '0';
+            shortCallsInput.value = state.shortCalls || '0';
             resolvedPriceInput.value = state.resolvedPrice !== undefined ? state.resolvedPrice : '';
             transferredPriceInput.value = state.transferredPrice !== undefined ? state.transferredPrice : '';
             callsInput.value = state.callsCount || '0';
@@ -630,11 +644,16 @@
         let resolvedPrice = parsePrice(resolvedPriceInput.value);
         let transferred = getIntFromStr(transferredInput.value);
         let transferredPrice = parsePrice(transferredPriceInput.value);
+        let shortCalls = getIntFromStr(shortCallsInput.value);
+        
         let totalRevenue = (resolved * resolvedPrice) + (transferred * transferredPrice);
         totalSumSpan.innerText = totalRevenue.toFixed(2);
-        let totalTickets = resolved + transferred;
-        totalTicketsSpan.innerText = totalTickets;
-        let transferredPercent = totalTickets ? (transferred / totalTickets) * 100 : 0;
+        
+        let totalCalls = resolved + transferred + shortCalls;
+        totalTicketsSpan.innerText = totalCalls;
+        
+        // Процент эскалации от общего числа звонков (включая короткие)
+        let transferredPercent = totalCalls ? (transferred / totalCalls) * 100 : 0;
         transferredPercentSpan.innerText = transferredPercent.toFixed(2);
 
         let c1 = getIntFromStr(document.getElementById('rating-1')?.value || '0');
@@ -678,9 +697,8 @@
         document.querySelectorAll('.reset-small').forEach(btn => {
             btn.addEventListener('click', () => {
                 const targetId = btn.getAttribute('data-reset');
-                const isPrice = btn.getAttribute('data-is-price') === '1';
                 const targetInput = document.getElementById(targetId);
-                if (targetInput && !isPrice) {
+                if (targetInput) {
                     targetInput.value = '0';
                     updateDashboard();
                     if (targetId === 'calls-count' || targetId === 'talk-time' || targetId === 'postcall') {
@@ -719,7 +737,7 @@
                             </div>
                         </td>
                         <td class="stars-cell">${symbols}</td>
-                     </tr>`;
+                    </tr>`;
         }
         tableBody.innerHTML = rows;
         document.querySelectorAll('.reset-btn').forEach(btn => {
@@ -790,7 +808,7 @@
 
     // ========== РУЧНОЙ ВВОД ==========
     function attachManualInputEvents() {
-        const countFields = [resolvedInput, transferredInput];
+        const countFields = [resolvedInput, transferredInput, shortCallsInput];
         countFields.forEach(inp => {
             inp.addEventListener('input', function() {
                 let num = parseInt(this.value, 10);
@@ -871,19 +889,21 @@
         buildRatingsTable(currentGender, true);
         const isWoman = (currentGender === 'woman');
         const leftLabels = document.querySelectorAll('.card:first-child .input-group label');
-        if (leftLabels.length >= 4) {
+        if (leftLabels.length >= 5) {
             if (isWoman) {
                 leftLabels[0].innerHTML = '🌸 Решенные тикеты <span>кол-во</span>';
                 leftLabels[1].innerHTML = '🦋 Переданные тикеты <span>кол-во</span>';
-                leftLabels[2].innerHTML = '💎 Стоимость одного решенного тикета <span>руб</span>';
-                leftLabels[3].innerHTML = '✨ Стоимость переданного тикета <span>руб</span>';
+                leftLabels[2].innerHTML = '📞 Короткие звонки &lt;21с <span>кол-во</span>';
+                leftLabels[3].innerHTML = '💎 Стоимость одного решенного тикета <span>руб</span>';
+                leftLabels[4].innerHTML = '✨ Стоимость переданного тикета <span>руб</span>';
                 document.getElementById('left-card-title').innerHTML = '🌸 Тикеты & стоимость';
                 document.getElementById('right-card-title').innerHTML = '💖 Оценки клиентов (CSAT)';
             } else {
                 leftLabels[0].innerHTML = '✅ Решенные тикеты <span>кол-во</span>';
                 leftLabels[1].innerHTML = '🔄 Переданные тикеты <span>кол-во</span>';
-                leftLabels[2].innerHTML = '💰 Стоимость одного решенного тикета <span>руб</span>';
-                leftLabels[3].innerHTML = '🏷️ Стоимость переданного тикета <span>руб</span>';
+                leftLabels[2].innerHTML = '📞 Звонки меньше 21с <span>кол-во</span>';
+                leftLabels[3].innerHTML = '💰 Стоимость одного решенного тикета <span>руб</span>';
+                leftLabels[4].innerHTML = '🏷️ Стоимость переданного тикета <span>руб</span>';
                 document.getElementById('left-card-title').innerHTML = '📊 Тикеты & стоимость';
                 document.getElementById('right-card-title').innerHTML = '⭐ Оценки клиентов (CSAT)';
             }
