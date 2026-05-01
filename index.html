@@ -420,7 +420,7 @@
         <div class="card">
             <div class="card-title" id="right-card-title">⭐ Оценки клиентов (CSAT)</div>
             <table class="ratings-table">
-                <thead><tr><th>Сброс</th><th>Количество</th><th>Оценки</th><tr></thead>
+                <thead><tr><th>Сброс</th><th>Количество</th><th>Оценки</th></tr></thead>
                 <tbody id="ratings-table-body"></tbody>
             </table>
             <div class="result-block">
@@ -557,7 +557,17 @@
 
     // ========== LOCALSTORAGE ==========
     const STORAGE_KEY = 'support_analytics_state';
+
+    // Переменная для хранения загруженных оценок до создания таблицы
+    let loadedRatings = null;
+
     function saveToLocalStorage() {
+        // Получаем текущие значения полей рейтинга (если они существуют)
+        let ratings = {};
+        for (let i = 1; i <= 5; i++) {
+            const inp = document.getElementById(`rating-${i}`);
+            ratings[i] = inp ? inp.value : '0';
+        }
         const state = {
             resolvedTickets: resolvedInput.value,
             transferredTickets: transferredInput.value,
@@ -566,13 +576,7 @@
             callsCount: callsInput.value,
             talkTime: talkTimeInput.value,
             postcall: postcallInput.value,
-            ratings: {
-                1: document.getElementById('rating-1')?.value || '0',
-                2: document.getElementById('rating-2')?.value || '0',
-                3: document.getElementById('rating-3')?.value || '0',
-                4: document.getElementById('rating-4')?.value || '0',
-                5: document.getElementById('rating-5')?.value || '0'
-            },
+            ratings: ratings,
             currentGender: currentGender,
             currentBrightness: currentBrightness,
             speedModeActive: speedModeActive,
@@ -593,10 +597,11 @@
             callsInput.value = state.callsCount || '0';
             talkTimeInput.value = state.talkTime || '0';
             postcallInput.value = state.postcall || '0';
+            // Сохраняем рейтинги во временную переменную (таблица ещё не создана)
             if (state.ratings) {
+                loadedRatings = {};
                 for (let i = 1; i <= 5; i++) {
-                    const inp = document.getElementById(`rating-${i}`);
-                    if (inp) inp.value = state.ratings[i] || '0';
+                    loadedRatings[i] = state.ratings[i] || '0';
                 }
             }
             currentGender = state.currentGender === 'woman' ? 'woman' : 'man';
@@ -687,12 +692,16 @@
     }
 
     // ========== ТАБЛИЦА CSAT ==========
-    function buildRatingsTable(gender, preserveValues = true) {
+    function buildRatingsTable(gender, preserveValues = true, initialValues = null) {
         let savedValues = [0,0,0,0,0];
         if (preserveValues) {
             for (let i = 1; i <= 5; i++) {
                 const inp = document.getElementById(`rating-${i}`);
                 if (inp) savedValues[i-1] = inp.value;
+            }
+        } else if (initialValues) {
+            for (let i = 1; i <= 5; i++) {
+                savedValues[i-1] = initialValues[i] || '0';
             }
         }
         const isWoman = (gender === 'woman');
@@ -710,7 +719,7 @@
                             </div>
                         </td>
                         <td class="stars-cell">${symbols}</td>
-                    </tr>`;
+                     </tr>`;
         }
         tableBody.innerHTML = rows;
         document.querySelectorAll('.reset-btn').forEach(btn => {
@@ -858,6 +867,7 @@
     function applyTheme() {
         const themeClass = `${currentGender}-${currentBrightness}`;
         document.body.className = themeClass;
+        // Перестраиваем таблицу с сохранением текущих значений
         buildRatingsTable(currentGender, true);
         const isWoman = (currentGender === 'woman');
         const leftLabels = document.querySelectorAll('.card:first-child .input-group label');
@@ -973,15 +983,17 @@
 
     // ========== СТАРТ ==========
     window.addEventListener('DOMContentLoaded', () => {
-        // Загружаем сохранённое состояние
+        // Загружаем сохранённые данные (loadedRatings заполнится)
         const hasSaved = loadFromLocalStorage();
-        // Инициализируем всё
+        // Инициализируем обработчики (поля тикетов, скорости)
         attachManualInputEvents();
         setupLeftResetButtons();
-        buildRatingsTable(currentGender, !hasSaved); // если нет сохранения, ставим нули
+        // Создаём таблицу CSAT: если есть сохранённые рейтинги, используем их, иначе нули
+        buildRatingsTable(currentGender, false, hasSaved ? loadedRatings : null);
+        // Настраиваем кнопки +/- для всех полей
         setupButtons();
-        // Применяем темы и отображение режима
-        applyTheme();  // применит тему и восстановит таблицу с сохранёнными значениями
+        // Применяем темы (без перезаписи таблицы)
+        applyTheme(); // внутри применяет тему и вызывает buildRatingsTable(preserve=true) — но поля уже заполнены
         // Восстанавливаем режим скорости
         if (speedModeActive) {
             normalModeDiv.style.display = 'none';
@@ -1002,7 +1014,7 @@
         }
         updateDashboard();
         updateSpeedDashboard();
-        // Добавляем обработчики для переключений (они уже есть, но повторно для сохранения)
+        // Добавляем обработчики кнопок переключения режимов
         document.getElementById('genderToggle').addEventListener('click', toggleGender);
         document.getElementById('brightnessToggle').addEventListener('click', toggleBrightness);
         document.getElementById('vibeToggle').addEventListener('click', toggleVibe);
